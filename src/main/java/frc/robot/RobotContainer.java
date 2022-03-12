@@ -4,19 +4,25 @@
 
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.AutoCommand;
-import frc.robot.commands.RunFlywheel;
-import frc.robot.commands.VelocityArcadeDrive;
-import frc.robot.controlboard.JoystickCommand;
+import frc.robot.commands.Commands;
+import frc.robot.commands.SimpleArcadeDrive;
+import frc.robot.io.ControlBoard;
+import frc.robot.io.Input;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Magazine;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.dummy.DummyDrivetrain;
+import frc.robot.subsystems.dummy.DummyIntake;
+import frc.robot.subsystems.dummy.DummyMagazine;
+import frc.robot.subsystems.dummy.DummyShooter;
+import frc.robot.subsystems.physical.PhysicalDrivetrain;
+import frc.robot.subsystems.physical.PhysicalIntake;
+import frc.robot.subsystems.physical.PhysicalMagazine;
+import frc.robot.subsystems.physical.PhysicalShooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,39 +31,23 @@ import frc.robot.subsystems.Shooter;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private Drivetrain m_drivetrain;
-  private Shooter m_shooter;
+  private final boolean drivetrainEnabled = true;
+  private final boolean intakeEnabled = true;
+  private final boolean magazineEnabled = true;
+  private final boolean shooterEnabled = true;
 
-  private Command m_autoCommand;
+  private final Input input = new Input(new ControlBoard(Constants.XBOX_PORT, Constants.EXTREME_PORT, Constants.BUTTON_BOX_PORT));
 
-  private final Map<JoystickCommand, DoubleSupplier> m_joystickMap = new HashMap<>();
+  private final Drivetrain drivetrain = drivetrainEnabled ? new PhysicalDrivetrain() : new DummyDrivetrain();
+  private final Intake intake = intakeEnabled ? new PhysicalIntake() : new DummyIntake();
+  private final Magazine magazine = magazineEnabled ? new PhysicalMagazine() : new DummyMagazine();
+  private final Shooter shooter = shooterEnabled ? new PhysicalShooter() : new DummyShooter();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    drivetrain.setDefaultCommand(new SimpleArcadeDrive(drivetrain, input::getMove, input::getTurn));
+
     configureButtonBindings();
-
-    Drivetrain.HardwareMap drivetrainMap = new Drivetrain.HardwareMap();
-    drivetrainMap.driveLeftFrontID = 0;
-    drivetrainMap.driveLeftBackID = 1;
-    drivetrainMap.driveRightFrontID = 2;
-    drivetrainMap.driveRightBackID = 3;
-    drivetrainMap.driveLeftEncoderChannelA = 0;
-    drivetrainMap.driveLeftEncoderChannelB = 1;
-    drivetrainMap.driveRightEncoderChannelA = 2;
-    drivetrainMap.driveRightEncoderChannelB = 3;
-    drivetrainMap.pigeonID = 5;
-    m_drivetrain = new Drivetrain(drivetrainMap);
-
-    Shooter.HardwareMap shooterMap = new Shooter.HardwareMap();
-    shooterMap.flywheelID = 0;
-    shooterMap.flywheelEncoderChannelA = 0;
-    shooterMap.flywheelEncoderChannelB = 1;
-    m_shooter = new Shooter(shooterMap);
-
-    m_drivetrain.setDefaultCommand(new VelocityArcadeDrive(m_drivetrain, m_joystickMap.get(JoystickCommand.MOVE), m_joystickMap.get(JoystickCommand.TURN)));
-    m_shooter.setDefaultCommand(new RunFlywheel(m_shooter, () -> 0));
-
-    m_autoCommand = new AutoCommand();
   }
 
   /**
@@ -67,12 +57,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    m_joystickMap.put(JoystickCommand.MOVE, () -> {
-      return 0;
-    });
-    m_joystickMap.put(JoystickCommand.TURN, () -> {
-      return 0;
-    });
+    input.getToggleDriveShifterTrigger().whenActive(Commands.toggleDriveShifter(drivetrain));
+    input.getRunIntakeTrigger().whileActiveContinuous(Commands.runIntake(intake, () -> Constants.INTAKE_MAX_OUTPUT));
+    input.getRunMagazineTrigger().whileActiveContinuous(Commands.runMagazine(magazine, () -> Constants.MAGAZINE_MAX_OUTPUT));
+    input.getRunShooterTrigger().whileActiveContinuous(Commands.runShooter(shooter, () -> Constants.SHOOTER_MAX_OUTPUT));
   }
 
   /**
@@ -81,6 +69,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_autoCommand;
+    return null;
   }
 }

@@ -4,27 +4,34 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
+import si.uom.SI;
+import si.uom.quantity.AngularSpeed;
+import tech.units.indriya.quantity.Quantities;
+
+import javax.measure.Quantity;
+import javax.measure.quantity.Speed;
 
 public class VelocityArcadeDrive extends CommandBase {
-  private final Drivetrain m_drivetrain;
-  private final DoubleSupplier m_xSpeedSupplier, m_zRotationSupplier;
+  private final Drivetrain drivetrain;
+  private final Supplier<Quantity<Speed>> linearVelocitySupplier;
+  private final Supplier<Quantity<AngularSpeed>> angularVelocitySupplier;
 
   /**
    * Velocity based arcade drive
    * @param drivetrain Drivetrain subsystem
-   * @param xSpeedSupplier The desired velocity in meters per second
-   * @param zRotationSupplier The desired angular velocity in radians per second
+   * @param linearVelocitySupplier The desired velocity in meters per second
+   * @param angularVelocitySupplier The desired angular velocity in radians per second
    */
-  public VelocityArcadeDrive(final Drivetrain drivetrain, final DoubleSupplier xSpeedSupplier, final DoubleSupplier zRotationSupplier) {
-    m_drivetrain = drivetrain;
-    m_xSpeedSupplier = xSpeedSupplier;
-    m_zRotationSupplier = zRotationSupplier;
+  public VelocityArcadeDrive(Drivetrain drivetrain, Supplier<Quantity<Speed>> linearVelocitySupplier, Supplier<Quantity<AngularSpeed>> angularVelocitySupplier) {
+    this.drivetrain = drivetrain;
+    this.linearVelocitySupplier = linearVelocitySupplier;
+    this.angularVelocitySupplier = angularVelocitySupplier;
 
-    addRequirements(m_drivetrain);
+    addRequirements(this.drivetrain);
   }
 
   // Called when the command is initially scheduled.
@@ -34,18 +41,14 @@ public class VelocityArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.velocityArcadeDrive(m_xSpeedSupplier.getAsDouble(), m_zRotationSupplier.getAsDouble());
+    drivetrain.velocityArcadeDrive(linearVelocitySupplier.get(), angularVelocitySupplier.get());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.velocityArcadeDrive(0, 0);
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
+    if (!interrupted) {
+      drivetrain.velocityArcadeDrive(Quantities.getQuantity(0, SI.METRE_PER_SECOND), Quantities.getQuantity(0, SI.RADIAN_PER_SECOND));
+    }
   }
 }
