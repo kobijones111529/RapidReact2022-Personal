@@ -23,6 +23,9 @@ import frc.robot.subsystems.physical.PhysicalDrivetrain;
 import frc.robot.subsystems.physical.PhysicalIntake;
 import frc.robot.subsystems.physical.PhysicalMagazine;
 import frc.robot.subsystems.physical.PhysicalShooter;
+import frc.robot.utils.LimelightUtil;
+import si.uom.SI;
+import tech.units.indriya.quantity.Quantities;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -58,9 +61,20 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     input.getToggleDriveShifterTrigger().whenActive(Commands.toggleDriveShifter(drivetrain));
+    input.getAutoAlignToTargetTrigger().whileActiveContinuous(Commands.autoAlignToTarget(drivetrain, () -> LimelightUtil.getTargetXOffset(Constants.LIMELIGHT_TABLE_NAME).orElse(Quantities.getQuantity(0, SI.RADIAN))));
     input.getRunIntakeTrigger().whileActiveContinuous(Commands.runIntake(intake, () -> Constants.INTAKE_MAX_OUTPUT));
     input.getRunMagazineTrigger().whileActiveContinuous(Commands.runMagazine(magazine, () -> Constants.MAGAZINE_MAX_OUTPUT));
     input.getRunShooterTrigger().whileActiveContinuous(Commands.runShooter(shooter, () -> Constants.SHOOTER_MAX_OUTPUT));
+    input.getAutoShootTrigger().whileActiveContinuous(Commands.autoShoot(
+        magazine,
+        shooter,
+        () -> LimelightUtil.getDistanceToTarget(Constants.LIMELIGHT_TABLE_NAME, Constants.LIMELIGHT_HEIGHT, Constants.LIMELIGHT_MOUNT_ANGLE, Constants.HIGH_GOAL_HEIGHT),
+        () -> LimelightUtil.getTargetXOffset(Constants.LIMELIGHT_TABLE_NAME)
+    ));
+  }
+
+  public void writeNetworkTables() {
+
   }
 
   /**

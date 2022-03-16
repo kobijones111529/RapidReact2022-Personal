@@ -6,9 +6,11 @@ public class Input {
   private final ControlBoard controlBoard;
 
   private final Trigger toggleDriveShifter = new Trigger(); // TODO set
+  private final Trigger autoAlignToTargetTrigger = new Trigger(); // TODO set
   private final Trigger runIntake = new Trigger(); // TODO set
   private final Trigger runMagazine = new Trigger(); // TODO set
   private final Trigger runShooter = new Trigger(); // TODO set
+  private final Trigger autoShoot = new Trigger(); // TODO set
 
   public Input(ControlBoard controlBoard) {
     this.controlBoard = controlBoard;
@@ -23,6 +25,9 @@ public class Input {
   public Trigger getToggleDriveShifterTrigger() {
     return toggleDriveShifter;
   }
+  public Trigger getAutoAlignToTargetTrigger() {
+    return autoAlignToTargetTrigger;
+  }
   public Trigger getRunIntakeTrigger() {
     return runIntake;
   }
@@ -31,5 +36,8 @@ public class Input {
   }
   public Trigger getRunShooterTrigger() {
     return runShooter;
+  }
+  public Trigger getAutoShootTrigger() {
+    return autoShoot;
   }
 }

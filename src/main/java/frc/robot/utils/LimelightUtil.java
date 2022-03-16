@@ -36,24 +36,35 @@ public final class LimelightUtil {
     if (!hasTarget(table)) {
       return Optional.empty();
     }
-
     return Optional.of(Quantities.getQuantity(table.getEntry(X_KEY).getDouble(0), USCustomary.DEGREE_ANGLE));
   }
 
-  public static Optional<Quantity<Length>> getDistanceToTarget(String table, Quantity<Angle> cameraAngle, Quantity<Length> targetHeight) {
-    return getDistanceToTarget(NetworkTableInstance.getDefault().getTable(table), cameraAngle, targetHeight);
+  public static Optional<Quantity<Angle>> getTargetYOffset(String table) {
+    return getTargetYOffset(NetworkTableInstance.getDefault().getTable(table));
   }
 
-  public static Optional<Quantity<Length>> getDistanceToTarget(NetworkTable table, Quantity<Angle> cameraAngle, Quantity<Length> targetHeight) {
+  public static Optional<Quantity<Angle>> getTargetYOffset(NetworkTable table) {
+    if (!hasTarget(table)) {
+      return Optional.empty();
+    }
+    return Optional.of(Quantities.getQuantity(table.getEntry(Y_KEY).getDouble(0), USCustomary.DEGREE_ANGLE));
+  }
+
+  public static Optional<Quantity<Length>> getDistanceToTarget(String table, Quantity<Length> cameraHeight, Quantity<Angle> cameraAngle, Quantity<Length> targetHeight) {
+    return getDistanceToTarget(NetworkTableInstance.getDefault().getTable(table), cameraHeight, cameraAngle, targetHeight);
+  }
+
+  public static Optional<Quantity<Length>> getDistanceToTarget(NetworkTable table, Quantity<Length> cameraHeight, Quantity<Angle> cameraAngle, Quantity<Length> targetHeight) {
     if (!hasTarget(table)) {
       return Optional.empty();
     }
 
-    Quantity<Angle> cameraToTarget = Quantities.getQuantity(table.getEntry(X_KEY).getDouble(0), USCustomary.DEGREE_ANGLE);
+    Quantity<Length> heightOffset = targetHeight.subtract(cameraHeight);
+    Quantity<Angle> cameraToTarget = Quantities.getQuantity(table.getEntry(Y_KEY).getDouble(0), USCustomary.DEGREE_ANGLE);
     Quantity<Angle> angleToTarget = cameraAngle.add(cameraToTarget);
 
     // tan(θ) = y / x
-    Quantity<Length> distance = targetHeight.divide(Math.tan(angleToTarget.to(SI.RADIAN).getValue().doubleValue()));
+    Quantity<Length> distance = heightOffset.divide(Math.tan(angleToTarget.to(SI.RADIAN).getValue().doubleValue()));
 
     return Optional.of(distance);
   }

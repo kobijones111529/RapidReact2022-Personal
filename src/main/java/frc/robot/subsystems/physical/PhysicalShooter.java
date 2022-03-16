@@ -18,7 +18,6 @@ import systems.uom.common.USCustomary;
 import tech.units.indriya.quantity.Quantities;
 
 import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 
 public class PhysicalShooter implements Shooter {
   private final WPI_TalonFX motor = new WPI_TalonFX(Constants.SHOOTER_MOTOR_ID);

@@ -6,21 +6,31 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import frc.robot.utils.InterpolatingQuantity;
+import frc.robot.utils.InterpolatingTreeMap;
 import si.uom.SI;
 import si.uom.quantity.AngularAcceleration;
+import si.uom.quantity.AngularSpeed;
 import tech.units.indriya.quantity.Quantities;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
-import javax.measure.quantity.Acceleration;
-import javax.measure.quantity.Frequency;
-import javax.measure.quantity.Length;
-import javax.measure.quantity.Speed;
+import javax.measure.quantity.*;
 
 import systems.uom.common.USCustomary;
 
 public class Constants {
   public static final Quantity<Acceleration> GRAVITY = Quantities.getQuantity(-9.8, SI.METRE_PER_SQUARE_SECOND);
+
+  // Field
+  public static final Quantity<Length> HIGH_GOAL_HEIGHT = Quantities.getQuantity(0, SI.METRE); // TODO look up value
+
+  // Spacial position/orientation
+  // Relative to robot
+  public static final Quantity<Length> LIMELIGHT_POS_X = Quantities.getQuantity(0, SI.METRE);
+  public static final Quantity<Length> LIMELIGHT_POS_Z = Quantities.getQuantity(0, SI.METRE);
+  public static final Quantity<Length> LIMELIGHT_HEIGHT = Quantities.getQuantity(0, SI.METRE);
+  public static final Quantity<Angle> LIMELIGHT_MOUNT_ANGLE = Quantities.getQuantity(0, SI.RADIAN);
 
   // Robot
   public static final double INTAKE_MAX_OUTPUT = 1;
@@ -31,6 +41,9 @@ public class Constants {
   public static final int XBOX_PORT = 0;
   public static final int EXTREME_PORT = 1;
   public static final int BUTTON_BOX_PORT = 2;
+
+  // Limelight
+  public static final String LIMELIGHT_TABLE_NAME = "limelight";
 
   // CAN
   public static final int DRIVETRAIN_DRIVE_LEFT_FRONT_ID = 0;
@@ -92,6 +105,14 @@ public class Constants {
   public static final double SHOOTER_PID_P = 0.01;
   public static final double SHOOTER_PID_I = 0;
   public static final double SHOOTER_PID_D = 0;
+  public static final Quantity<Length> SHOOTER_MIN_DISTANCE = Quantities.getQuantity(0, SI.METRE);
+  public static final Quantity<Length> SHOOTER_MAX_DISTANCE = Quantities.getQuantity(Double.POSITIVE_INFINITY, SI.METRE);
+  public static final Quantity<AngularSpeed> SHOOTER_SPEED_ERROR_TOLERANCE = Quantities.getQuantity(100, USCustomary.REVOLUTION_PER_MINUTE);
+  public static final Quantity<Angle> SHOOTER_ANGLE_ERROR_TOLERANCE = Quantities.getQuantity(5, USCustomary.DEGREE_ANGLE);
+  public static final InterpolatingTreeMap<InterpolatingQuantity<Length>, InterpolatingQuantity<AngularSpeed>> SHOOTER_DISTANCE_SPEED_MAP = new InterpolatingTreeMap<>();
+  static {
+    SHOOTER_DISTANCE_SPEED_MAP.put(new InterpolatingQuantity<>(Quantities.getQuantity(0, SI.METRE)), new InterpolatingQuantity<>(Quantities.getQuantity(0, USCustomary.REVOLUTION_PER_MINUTE)));
+  }
 
   private Constants() { }
 }

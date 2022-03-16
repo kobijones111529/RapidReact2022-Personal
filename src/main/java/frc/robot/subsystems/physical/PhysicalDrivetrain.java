@@ -69,7 +69,7 @@ public class PhysicalDrivetrain implements Drivetrain {
   private final SlewRateLimiter linearAccelerationLimiter = new SlewRateLimiter(Constants.DRIVETRAIN_LINEAR_ACCELERATION_LIMIT.to(SI.METRE_PER_SQUARE_SECOND).getValue().doubleValue());
   private final SlewRateLimiter angularAccelerationLimiter = new SlewRateLimiter(Constants.DRIVETRAIN_ANGULAR_ACCELERATION_LIMIT.to(SI.RADIAN_PER_SQUARE_SECOND).getValue().doubleValue());
 
-  public PhysicalDrivetrain() {
+  {
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
 
     gyroAngleEntry = table.getEntry("Gyro enabled");
@@ -115,6 +115,7 @@ public class PhysicalDrivetrain implements Drivetrain {
     rightDriveEncoder = new Encoder(Constants.DRIVETRAIN_ENCODER_RIGHT_CHANNEL_A, Constants.DRIVETRAIN_ENCODER_RIGHT_CHANNEL_B);
 
     leftDriveEncoder.setDistancePerPulse(Constants.DRIVETRAIN_ENCODER_DISTANCE_PER_PULSE.to(Constants.DRIVETRAIN_ENCODER_DISTANCE_UNIT).getValue().doubleValue());
+    rightDriveEncoder.setDistancePerPulse(Constants.DRIVETRAIN_ENCODER_DISTANCE_PER_PULSE.to(Constants.DRIVETRAIN_ENCODER_DISTANCE_UNIT).getValue().doubleValue());
 
     differentialDrive = new DifferentialDrive(leftDriveMaster, rightDriveMaster);
 

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import si.uom.quantity.AngularSpeed;
 
 import javax.measure.Quantity;
-import javax.measure.quantity.Length;
 
 public interface Shooter extends Subsystem {
   Quantity<AngularSpeed> getSpeed();
